@@ -1,9 +1,9 @@
-package com.progetto.ingsw.progettotrukscout24.Controller;
+package com.progetto.ingsw.progettotruckscout24.Controller;
 
-import com.progetto.ingsw.trukscout24.Database.DBConnessione;
-import com.progetto.ingsw.trukscout24.Database.Validazione;
-import com.progetto.ingsw.trukscout24.Messaggi;
-import com.progetto.ingsw.trukscout24.View.SceneHandler;
+import com.progetto.ingsw.progettotruckscout24.Database.DBConnessione;
+import com.progetto.ingsw.progettotruckscout24.Database.Validazione;
+import com.progetto.ingsw.progettotruckscout24.Messaggi;
+import com.progetto.ingsw.progettotruckscout24.View.SceneHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;

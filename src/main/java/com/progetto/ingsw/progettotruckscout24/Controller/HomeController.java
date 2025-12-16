@@ -65,7 +65,6 @@ public class HomeController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            // Salva l'istanza corrente
             instance = this;
 
             DBConnessione dbConnessione = DBConnessione.getInstance();
@@ -317,7 +316,7 @@ public class HomeController implements Initializable {
 
         String imagePath = camion.id();
         if (imagePath != null && !imagePath.isEmpty()) {
-            String fullPath = "/com/progetto/ingsw/trukscout24/immagini/" + imagePath + ".jpg";
+            String fullPath = "/com/progetto/ingsw/progettotruckscout24/immagini/" + imagePath + ".jpg";
             URL imageUrl = getClass().getResource(fullPath);
             if (imageUrl != null) {
                 imageView.setImage(new Image(imageUrl.toExternalForm()));

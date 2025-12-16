@@ -3,6 +3,7 @@ package com.progetto.ingsw.progettotruckscout24.View;
 import com.progetto.ingsw.progettotruckscout24.Controller.ProductViewController;
 import com.progetto.ingsw.progettotruckscout24.Database.Authenticazione;
 import com.progetto.ingsw.progettotruckscout24.HelloApplication;
+
 import com.progetto.ingsw.progettotruckscout24.Model.Camion;
 import com.progetto.ingsw.progettotruckscout24.Model.Utente;
 import javafx.fxml.FXMLLoader;
@@ -20,10 +21,7 @@ public class SceneHandler {
     private final static String RESOURCE_PATH = "/com/progetto/ingsw/progettotruckscout24/";
     private final static String FXML_PATH = RESOURCE_PATH + "fxmls/";
     private final static String Image_PATH = RESOURCE_PATH + "immagini/";
-    //private final static String CSS_PATH = RESOURCE_PATH + "css/";
-    //private final static String FONTS_PATH = RESOURCE_PATH + "fonts/";
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    private String theme = "light";
     private Scene scene;
     private Stage stage;
 
@@ -143,6 +141,32 @@ public class SceneHandler {
         return instance;
     }
 
+/*
+    private List<String> loadCSS() {
+        List<String> resources = new ArrayList<>();
+        for (String style : List.of(CSS_PATH + theme + ".css", CSS_PATH + "fonts.css", CSS_PATH + "Style.css")) {
+            String resource = Objects.requireNonNull(SceneHandler.class.getResource(style)).toExternalForm();
+            resources.add(resource);
+        }
+        return resources;
+    }
+
+    private void setCSSForScene(Scene scene) {
+        Objects.requireNonNull(scene, "Scene cannot be null");
+        List<String> resources = loadCSS();
+        scene.getStylesheets().clear();
+        for(String resource : resources)
+            scene.getStylesheets().add(resource);
+    }
+/*
+    private void loadFonts() {
+        for (String font : List.of(FONTS_PATH + "Roboto/Roboto-Medium.ttf")) {
+            Font.loadFont(Objects.requireNonNull(SceneHandler.class.getResource(font)).toExternalForm(), 10);
+        }
+    }
+    */
+
+
     public void showAlert(String Head, String message, int type) {
         alert = new Alert(Alert.AlertType.INFORMATION);
         stage.getIcons().add(new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("Icone/TruckScout24.png"))));
@@ -160,6 +184,28 @@ public class SceneHandler {
         alert.setContentText(message);
         alert.show();
     }
+    /*
+    public void changeTheme() {
+        if("dark".equals(theme))
+            theme = "light";
+        else
+            theme = "dark";
+        changedTheme();
+    }
+
+    private void changedTheme() {
+        setCSSForScene(scene);
+        setCSSForAlert(alert);
+    }
+
+    private void setCSSForAlert(Alert alert) {
+        Objects.requireNonNull(alert, "Alert cannot be null");
+        List<String> resources = loadCSS();
+        alert.getDialogPane().getStylesheets().clear();
+        for(String resource : resources)
+            alert.getDialogPane().getStylesheets().add(resource);
+    }
+    */
 
     public void setHomeScene() throws Exception {
         loadFXML("Home.fxml");

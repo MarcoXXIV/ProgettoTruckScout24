@@ -1,4 +1,4 @@
-package com.progetto.ingsw.progettotrukscout24;
+package com.progetto.ingsw.progettotruckscout24;
 
 public class Messaggi {
     public final static String login_effettuato = "Accesso effettuato con successo! Benvenuto/a, ";

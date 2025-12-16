@@ -10,7 +10,7 @@
 
 <ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.progetto.ingsw.trukscout24.Controller.UtenteController"
+            fx:controller="com.progetto.ingsw.progettotruckscout24.Controller.UtenteController"
             fitToWidth="true"
             fitToHeight="true"
             stylesheets="@../css/Utente.css">

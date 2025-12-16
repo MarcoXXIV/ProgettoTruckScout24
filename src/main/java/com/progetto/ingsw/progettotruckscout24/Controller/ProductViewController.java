@@ -182,7 +182,7 @@ public class ProductViewController implements Initializable {
 
     private void loadSimilarCamionImage(ImageView imageView, String camionId) {
         try {
-            String imagePath = "/com/progetto/ingsw/trukscout24/immagini/" + camionId + ".jpg";
+            String imagePath = "/com/progetto/ingsw/progettotruckscout24/immagini/" + camionId + ".jpg";
             URL imageUrl = getClass().getResource(imagePath);
             if (imageUrl != null) {
                 imageView.setImage(new Image(imageUrl.toExternalForm()));
@@ -241,7 +241,7 @@ public class ProductViewController implements Initializable {
         if (currentCamion == null || currentCamion.id() == null) return;
 
         try {
-            String imagePath = "/com/progetto/ingsw/trukscout24/immagini/" + currentCamion.id() + ".jpg";
+            String imagePath = "/com/progetto/ingsw/progettotruckscout24/immagini/" + currentCamion.id() + ".jpg";
             URL imageUrl = getClass().getResource(imagePath);
             if (imageUrl != null) {
                 mainImage.setImage(new Image(imageUrl.toExternalForm()));

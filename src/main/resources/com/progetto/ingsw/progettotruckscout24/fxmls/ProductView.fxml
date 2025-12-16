@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="900.0" prefWidth="1400.0" styleClass="root-container" stylesheets="@../css/ProductView.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.progetto.ingsw.trukscout24.Controller.ProductViewController">
+<VBox prefHeight="900.0" prefWidth="1400.0" styleClass="root-container" stylesheets="@../css/ProductView.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.progetto.ingsw.progettotruckscout24.Controller.ProductViewController">
 
     <!-- TOP HEADER -->
     <HBox alignment="CENTER" prefHeight="75.0" prefWidth="1400.0" styleClass="top-header">

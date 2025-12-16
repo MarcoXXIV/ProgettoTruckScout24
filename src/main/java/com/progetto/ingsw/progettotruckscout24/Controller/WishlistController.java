@@ -144,7 +144,7 @@ public class WishlistController implements Initializable {
         boolean imageLoaded = false;
 
         if (imagePath != null && !imagePath.isEmpty()) {
-            String fullPath = "/com/progetto/ingsw/trukscout24/immagini/" + imagePath + ".jpg";
+            String fullPath = "/com/progetto/ingsw/progettotruckscout24/immagini/" + imagePath + ".jpg";
             URL imageUrl = getClass().getResource(fullPath);
 
             if (imageUrl != null) {

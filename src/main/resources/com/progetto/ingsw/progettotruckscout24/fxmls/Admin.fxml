@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="900.0" prefWidth="1400.0" styleClass="main-container" stylesheets="@../../../../../../../../../../../repo/ProgettoTruckScout24/src/main/resources/com/progetto/ingsw/progettotruckscout24/css/Admin.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.progetto.ingsw.trukscout24.Controller.AdminController">
+<AnchorPane prefHeight="900.0" prefWidth="1400.0" styleClass="main-container" stylesheets="@../css/Admin.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.progetto.ingsw.progettotruckscout24.Controller.AdminController">
 
     <!-- Header con logo -->
     <HBox id="Box" alignment="CENTER" prefHeight="50.0" styleClass="footer-background" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

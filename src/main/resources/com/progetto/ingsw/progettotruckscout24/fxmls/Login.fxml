@@ -16,9 +16,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefHeight="346.0" prefWidth="150.0" styleClass="background-pane" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.progetto.ingsw.trukscout24.Controller.LoginController">
+<StackPane prefHeight="346.0" prefWidth="150.0" styleClass="background-pane" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.progetto.ingsw.progettotruckscout24.Controller.LoginController">
     <stylesheets>
-        <URL value="@../../../../../../../../../../../repo/ProgettoTruckScout24/src/main/resources/com/progetto/ingsw/progettotruckscout24/css/Login.css" />
+        <URL value="@../css/Login.css" />
     </stylesheets>
 
     <!-- Immagine di sfondo sfocata -->

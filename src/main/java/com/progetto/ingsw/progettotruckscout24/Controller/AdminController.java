@@ -2,7 +2,7 @@ package com.progetto.ingsw.progettotruckscout24.Controller;
 
 import com.progetto.ingsw.progettotruckscout24.Database.DBConnessione;
 import com.progetto.ingsw.progettotruckscout24.Model.Prenotazione;
-import com.progetto.ingsw.progettotrukscout24.Messaggi;
+import com.progetto.ingsw.progettotruckscout24.Messaggi;
 import com.progetto.ingsw.progettotruckscout24.View.SceneHandler;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -120,7 +120,7 @@ public class AdminController implements Initializable {
         }
 
         try {
-            Path resourcesDir = Paths.get("/com/progetto/ingsw/trukscout24/immagini/");
+            Path resourcesDir = Paths.get("/com/progetto/ingsw/progettotruckscout24/immagini/");
             if (!Files.exists(resourcesDir)) {
                 Files.createDirectories(resourcesDir);
             }
@@ -162,7 +162,7 @@ public class AdminController implements Initializable {
 
     private void rimuoviImmagineEsistente(String idCamion) {
         try {
-            Path resourcesDir = Paths.get("/com/progetto/ingsw/trukscout24/immagini/");
+            Path resourcesDir = Paths.get("/com/progetto/ingsw/progettotruckscout24/immagini/");
             if (Files.exists(resourcesDir)) {
                 String[] extensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp"};
                 for (String ext : extensions) {
@@ -270,12 +270,8 @@ public class AdminController implements Initializable {
             throw new ParseException("Valore vuoto", 0);
         }
 
-        // Rimuove gli spazi
         value = value.trim();
 
-        // Il NumberFormat.getInstance(Locale.ITALY) gestisce automaticamente:
-        // - Il punto (.) come separatore delle migliaia
-        // - La virgola (,) come separatore decimale
         Number number = numberFormatIT.parse(value);
         return number.doubleValue();
     }

@@ -1,10 +1,10 @@
-package com.progetto.ingsw.progettotrukscout24.Controller;
+package com.progetto.ingsw.progettotruckscout24.Controller;
 
-import com.progetto.ingsw.trukscout24.Database.DBConnessione;
-import com.progetto.ingsw.trukscout24.Database.Validazione;
-import com.progetto.ingsw.trukscout24.Messaggi;
-import com.progetto.ingsw.trukscout24.Model.Utente;
-import com.progetto.ingsw.trukscout24.View.SceneHandler;
+import com.progetto.ingsw.progettotruckscout24.Database.DBConnessione;
+import com.progetto.ingsw.progettotruckscout24.Database.Validazione;
+import com.progetto.ingsw.progettotruckscout24.Messaggi;
+import com.progetto.ingsw.progettotruckscout24.Model.Utente;
+import com.progetto.ingsw.progettotruckscout24.View.SceneHandler;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -20,7 +20,6 @@ import javafx.util.Duration;
 import java.util.concurrent.CompletableFuture;
 
 public class LoginController {
-    //m
     public VBox formBox;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;

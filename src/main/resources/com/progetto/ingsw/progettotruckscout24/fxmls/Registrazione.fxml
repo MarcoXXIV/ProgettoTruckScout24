@@ -7,11 +7,11 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.progetto.ingsw.trukscout24.Controller.RegistrazioneController"
+            fx:controller="com.progetto.ingsw.progettotruckscout24.Controller.RegistrazioneController"
             fx:id="rootPane"
             prefHeight="900.0"
             prefWidth="1400.0"
-            stylesheets="@../../../../../../../../../../../repo/ProgettoTruckScout24/src/main/resources/com/progetto/ingsw/progettotruckscout24/css/Registrazione.css"
+            stylesheets="@../css/Registrazione.css"
             styleClass="root">
 
     <!-- Immagine di sfondo sfocata -->
