@@ -1,6 +1,7 @@
 package com.progetto.ingsw.progettotruckscout24.Controller;
 
 import com.progetto.ingsw.progettotruckscout24.Database.DBConnessione;
+import com.progetto.ingsw.progettotruckscout24.Database.ProxyPrenotazione;
 import com.progetto.ingsw.progettotruckscout24.Model.Prenotazione;
 import com.progetto.ingsw.progettotruckscout24.Messaggi;
 import com.progetto.ingsw.progettotruckscout24.View.SceneHandler;
@@ -33,7 +34,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
 public class AdminController implements Initializable {
-    //m
+    private final ProxyPrenotazione proxyPrenotazione = ProxyPrenotazione.getInstance(); // USA IL PROXY per gestire le prenotazioni
     private final DBConnessione dbconnessione = DBConnessione.getInstance();
     private final SceneHandler sceneHandler = SceneHandler.getInstance();
     private final NumberFormat numberFormatIT = NumberFormat.getInstance(Locale.ITALY);
@@ -248,7 +249,8 @@ public class AdminController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            dbconnessione.removeSelectedPrenotazioniItem(prenotazione.nome_camion(), prenotazione.id_utente());
+            // USA IL PROXY invece di DBConnessione direttamente
+            proxyPrenotazione.removePrenotazione(prenotazione.nome_camion(), prenotazione.id_utente());
             sceneHandler.showAlert("Successo", "Prenotazione eliminata con successo", 1);
             loadPrenotazioni();
         }
@@ -264,14 +266,12 @@ public class AdminController implements Initializable {
         }
     }
 
-    // Metodo helper per parsare i numeri usando il formato italiano
     private Double parseItalianDouble(String value) throws ParseException {
         if (value == null || value.trim().isEmpty()) {
             throw new ParseException("Valore vuoto", 0);
         }
 
         value = value.trim();
-
         Number number = numberFormatIT.parse(value);
         return number.doubleValue();
     }
@@ -282,8 +282,6 @@ public class AdminController implements Initializable {
         }
 
         value = value.trim();
-
-        // Per gli interi rimuoviamo solo i separatori delle migliaia
         Number number = numberFormatIT.parse(value);
         return number.intValue();
     }
@@ -380,7 +378,6 @@ public class AdminController implements Initializable {
         thread.setDaemon(true);
         thread.start();
     }
-
 
     @FXML
     private void rimuoviCamion() {
@@ -486,7 +483,8 @@ public class AdminController implements Initializable {
             @Override
             protected ArrayList<Prenotazione> call() throws Exception {
                 try {
-                    CompletableFuture<ArrayList<Prenotazione>> future = dbconnessione.getPrenotazioniAdmin();
+                    // USA IL PROXY invece di DBConnessione direttamente
+                    CompletableFuture<ArrayList<Prenotazione>> future = proxyPrenotazione.getPrenotazioni();
                     return future.get();
                 } catch (Exception e) {
                     e.printStackTrace();

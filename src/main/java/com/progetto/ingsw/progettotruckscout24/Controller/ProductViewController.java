@@ -1,6 +1,7 @@
 package com.progetto.ingsw.progettotruckscout24.Controller;
 
 import com.progetto.ingsw.progettotruckscout24.Database.DBConnessione;
+import com.progetto.ingsw.progettotruckscout24.Database.ProxyPrenotazione;
 import com.progetto.ingsw.progettotruckscout24.Messaggi;
 import com.progetto.ingsw.progettotruckscout24.Model.Camion;
 import com.progetto.ingsw.progettotruckscout24.View.SceneHandler;
@@ -46,6 +47,7 @@ public class ProductViewController implements Initializable {
 
     private final SceneHandler sceneHandler = SceneHandler.getInstance();
     private final DBConnessione dbconnessione = DBConnessione.getInstance();
+    private final ProxyPrenotazione proxyPrenotazione = ProxyPrenotazione.getInstance(); // proxy per gestire le prenotazioni
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -319,15 +321,20 @@ public class ProductViewController implements Initializable {
         Task<Void> prenotaTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                dbconnessione.insertPrenotazioneIntoDB(
-                        userEmail, currentCamion.nome(),
-                        date.getDayOfMonth(), date.getMonthValue(), date.getYear()
+                proxyPrenotazione.insertPrenotazione( // uso il proxy per gestire le prenotazioni
+                        userEmail,
+                        currentCamion.nome(),
+                        date.getDayOfMonth(),
+                        date.getMonthValue(),
+                        date.getYear()
                 );
                 return null;
             }
         };
 
-        prenotaTask.setOnSucceeded(e -> Platform.runLater(() -> prenotaButton.setDisable(false)));
+        prenotaTask.setOnSucceeded(e -> Platform.runLater(() -> {
+            prenotaButton.setDisable(false);
+        }));
 
         prenotaTask.setOnFailed(e -> Platform.runLater(() -> {
             prenotaButton.setDisable(false);

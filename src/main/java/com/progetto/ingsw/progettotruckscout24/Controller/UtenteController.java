@@ -1,6 +1,7 @@
 package com.progetto.ingsw.progettotruckscout24.Controller;
 
 import com.progetto.ingsw.progettotruckscout24.Database.DBConnessione;
+import com.progetto.ingsw.progettotruckscout24.Database.ProxyPrenotazione;
 import com.progetto.ingsw.progettotruckscout24.Messaggi;
 import com.progetto.ingsw.progettotruckscout24.Model.Prenotazione;
 import com.progetto.ingsw.progettotruckscout24.Model.Utente;
@@ -22,6 +23,8 @@ public class UtenteController implements Initializable {
 
     private final SceneHandler sceneHandler = SceneHandler.getInstance();
     private final DBConnessione db = DBConnessione.getInstance();
+    // USA IL PROXY invece di accedere direttamente a DBConnessione per le prenotazioni
+    private final ProxyPrenotazione proxyPrenotazione = ProxyPrenotazione.getInstance();
 
     private String currentUserEmail;
     private Utente currentUser;
@@ -114,10 +117,17 @@ public class UtenteController implements Initializable {
     }
 
     private void setupTable() {
-        idCamionColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().nome_camion()));
-        dataColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().giorno() + "/" + cellData.getValue().mese() + "/" + cellData.getValue().anno()));
-        statoColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty("Confermata"));
-        azioniColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty("Cancella"));
+        idCamionColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().nome_camion()));
+        dataColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(
+                        cellData.getValue().giorno() + "/" +
+                                cellData.getValue().mese() + "/" +
+                                cellData.getValue().anno()));
+        statoColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty("Confermata"));
+        azioniColumn.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty("Cancella"));
 
         azioniColumn.setCellFactory(column -> new TableCell<Prenotazione, String>() {
             private final Button btn = new Button("Cancella");
@@ -147,15 +157,17 @@ public class UtenteController implements Initializable {
     }
 
     private void deletePrenotazione(Prenotazione prenotazione) {
-        db.removeSelectedPrenotazioniItem(prenotazione.nome_camion(), prenotazione.id_utente());
-        sceneHandler.showAlert("Errore", Messaggi.PRENOTAZIONE_CANCELLATA, 0);
+        // USA IL PROXY invece di DBConnessione direttamente
+        proxyPrenotazione.removePrenotazione(prenotazione.nome_camion(), prenotazione.id_utente());
+        sceneHandler.showAlert("Successo", Messaggi.PRENOTAZIONE_CANCELLATA, 1);
         loadPrenotazioni();
     }
 
     private void loadPrenotazioni() {
         if (currentUserEmail == null) return;
 
-        db.getPrenotazione(currentUserEmail).thenAccept(lista -> {
+        // USA IL PROXY invece di DBConnessione direttamente
+        proxyPrenotazione.getPrenotazioni().thenAccept(lista -> {
             javafx.application.Platform.runLater(() -> {
                 prenotazioni.clear();
                 if (lista != null) {
@@ -194,7 +206,6 @@ public class UtenteController implements Initializable {
         }
 
         String encryptedPassword = db.encryptedPassword(password);
-
         db.updatePassword(currentUserEmail, encryptedPassword);
 
         passwordField.clear();
@@ -216,13 +227,18 @@ public class UtenteController implements Initializable {
         aggiungiCamionForm.setManaged(true);
     }
 
-    @FXML public void refreshBookingsAction(ActionEvent actionEvent) {
+    @FXML
+    public void refreshBookingsAction(ActionEvent actionEvent) {
         loadPrenotazioni();
     }
 
-    @FXML public void newBookingAction(ActionEvent actionEvent) {
+    @FXML
+    public void newBookingAction(ActionEvent actionEvent) {
+        // Implementazione per nuova prenotazione
     }
 
-    @FXML public void updateProfileAction(ActionEvent actionEvent) {
+    @FXML
+    public void updateProfileAction(ActionEvent actionEvent) {
+        // Implementazione per aggiornamento profilo
     }
 }
