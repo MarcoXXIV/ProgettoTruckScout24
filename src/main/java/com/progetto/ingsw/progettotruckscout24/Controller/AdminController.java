@@ -1,4 +1,4 @@
-package com.progetto.ingsw.trukscout24.Controller;
+package com.progetto.ingsw.progettotrukscout24.Controller;
 
 import com.progetto.ingsw.trukscout24.Database.DBConnessione;
 import com.progetto.ingsw.trukscout24.Model.Prenotazione;
