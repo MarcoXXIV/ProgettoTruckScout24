@@ -1,9 +1,9 @@
-package com.progetto.ingsw.progettotrukscout24.Controller;
+package com.progetto.ingsw.progettotruckscout24.Controller;
 
-import com.progetto.ingsw.trukscout24.Database.DBConnessione;
-import com.progetto.ingsw.trukscout24.Model.Prenotazione;
-import com.progetto.ingsw.trukscout24.Messaggi;
-import com.progetto.ingsw.trukscout24.View.SceneHandler;
+import com.progetto.ingsw.progettotruckscout24.Database.DBConnessione;
+import com.progetto.ingsw.progettotruckscout24.Model.Prenotazione;
+import com.progetto.ingsw.progettotrukscout24.Messaggi;
+import com.progetto.ingsw.progettotruckscout24.View.SceneHandler;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

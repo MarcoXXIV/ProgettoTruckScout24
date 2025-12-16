@@ -1,6 +1,7 @@
 package com.progetto.ingsw.progettotruckscout24.Database;
 
-import com.progetto.ingsw.trukscout24.Model.Utente;
+
+import com.progetto.ingsw.progettotruckscout24.Model.Utente;
 
 // pattern
 public class Authenticazione {

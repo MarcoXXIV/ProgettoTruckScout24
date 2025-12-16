@@ -2,11 +2,11 @@ package com.progetto.ingsw.progettotruckscout24.Database;
 
 
 import java.sql.*;
-import com.progetto.ingsw.trukscout24.Messaggi;
-import com.progetto.ingsw.trukscout24.Model.Camion;
-import com.progetto.ingsw.trukscout24.Model.Prenotazione;
-import com.progetto.ingsw.trukscout24.Model.Utente;
-import com.progetto.ingsw.trukscout24.View.SceneHandler;
+import com.progetto.ingsw.progettotruckscout24.Messaggi;
+import com.progetto.ingsw.progettotruckscout24.Model.Camion;
+import com.progetto.ingsw.progettotruckscout24.Model.Prenotazione;
+import com.progetto.ingsw.progettotruckscout24.Model.Utente;
+import com.progetto.ingsw.progettotruckscout24.View.SceneHandler;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
