@@ -1,0 +1,28 @@
+package com.progetto.ingsw.progettotruckscout24.Database;
+
+import com.progetto.ingsw.progettotruckscout24.Model.Prenotazione;
+
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+
+// PATTERN DA UTILIZZARE IN ADMIN E UTENTE
+
+public class ProxyPrenotazione {
+    private static ProxyPrenotazione instance = null;
+    public static ProxyPrenotazione getInstance(){
+        if (instance == null){
+            instance = new ProxyPrenotazione();
+        }
+        return instance;
+    }
+
+    public CompletableFuture<ArrayList<Prenotazione>> getPrenotazioni() {
+        if (Authenticazione.getInstance().isAdmin()) {
+            return DBConnessione.getInstance().getPrenotazioniAdmin();
+        }
+        else{
+            return DBConnessione.getInstance().getPrenotazione(Authenticazione.getInstance().getUser().email());
+        }
+    }
+}
+

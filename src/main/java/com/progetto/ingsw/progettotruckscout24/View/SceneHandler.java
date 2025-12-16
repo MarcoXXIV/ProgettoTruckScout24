@@ -1,0 +1,196 @@
+package com.progetto.ingsw.progettotruckscout24.View;
+
+import com.progetto.ingsw.progettotruckscout24.Controller.ProductViewController;
+import com.progetto.ingsw.progettotruckscout24.Database.Authenticazione;
+import com.progetto.ingsw.progettotruckscout24.HelloApplication;
+import com.progetto.ingsw.progettotruckscout24.Model.Camion;
+import com.progetto.ingsw.progettotruckscout24.Model.Utente;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
+
+import java.util.Objects;
+
+public class SceneHandler {
+
+    private final static String RESOURCE_PATH = "/com/progetto/ingsw/progettotruckscout24/";
+    private final static String FXML_PATH = RESOURCE_PATH + "fxmls/";
+    private final static String Image_PATH = RESOURCE_PATH + "immagini/";
+    //private final static String CSS_PATH = RESOURCE_PATH + "css/";
+    //private final static String FONTS_PATH = RESOURCE_PATH + "fonts/";
+    private Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    private String theme = "light";
+    private Scene scene;
+    private Stage stage;
+
+    private static SceneHandler instance = null;
+    private SceneHandler() {}
+
+    private Camion selectedCamion; // Aggiungi questo campo
+    private String currentUserEmail;
+    private Utente currentUser;
+
+    private final Authenticazione auth = Authenticazione.getInstance();
+
+    public void setCurrentUserEmail(String email) {
+        this.currentUserEmail = email;
+    }
+
+    public String getCurrentUserEmail() {
+        Utente user = auth.getUser();
+        return user != null ? user.email() : null;
+    }
+
+    public void setCurrentUser(Utente user) {
+        this.currentUser = user;
+        this.currentUserEmail = user != null ? user.email() : null;
+        if (user != null) {
+            auth.login(user);
+        } else {
+            auth.logout();
+        }
+    }
+
+    public Utente getCurrentUser() {
+        return auth.getUser();
+    }
+
+    public boolean isUserAuthenticated() {
+        return auth.settedUser();
+    }
+
+    public boolean isCurrentUserAdmin() {
+        return auth.settedUser() && auth.isAdmin();
+    }
+
+    public void loginUser(Utente user) {
+        auth.login(user);
+        this.currentUser = user;
+        this.currentUserEmail = user != null ? user.email() : null;
+    }
+
+    public void logoutUser() {
+        auth.logout();
+        this.currentUser = null;
+        this.currentUserEmail = null;
+    }
+
+
+    public void setSelectedCamion(Camion camion) {
+        this.selectedCamion = camion;
+    }
+
+    public Camion getSelectedCamion() {
+        return selectedCamion;
+    }
+
+    public void setProductViewScene() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML_PATH + "ProductView.fxml"));
+        Parent root = loader.load();
+
+        ProductViewController controller = loader.getController();
+        if (selectedCamion != null) {
+            controller.setCamion(selectedCamion);
+        }
+
+        if (scene == null) {
+            scene = new Scene(root);
+        } else {
+            scene = new Scene(root, scene.getWidth(), scene.getHeight());
+        }
+
+        this.stage.setScene(scene);
+        stage.show();
+    }
+
+
+    public void init(Stage primaryStage) throws Exception {
+        if(this.stage != null)
+            return;
+        this.stage = primaryStage;
+        this.stage.getIcons().add(new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("Icone/TruckScout24.png"))));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML_PATH + "Home.fxml"));
+        this.scene = new Scene(loader.load(), null);
+        this.stage.setScene(scene);
+        this.stage.setTitle("Trukscout24");
+        this.stage.setMaximized(true);
+        this.stage.setMinWidth(1370);
+        this.stage.setMinHeight(700);
+        this.stage.show();
+    }
+
+    public String loadImm(String id){
+        return Image_PATH + id + ".jpg";
+    }
+
+    public void loadFXML(String FXMLPath) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML_PATH + FXMLPath));
+        if (scene == null) scene = new Scene(loader.load());
+        else scene = new Scene(loader.load(), scene.getWidth(), scene.getHeight());
+        //setCSSForScene(scene);
+        //loadFonts();
+        this.stage.setScene(scene);
+        stage.show();
+    }
+
+    public static SceneHandler getInstance() {
+        if(instance == null)
+            instance = new SceneHandler();
+        return instance;
+    }
+
+    public void showAlert(String Head, String message, int type) {
+        alert = new Alert(Alert.AlertType.INFORMATION);
+        stage.getIcons().add(new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("Icone/TruckScout24.png"))));
+        ImageView icon = new ImageView();
+        if (type == 1){
+            icon = new ImageView(new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("Icone/information_alert.png"))));
+        } else if (type == 0) {
+            icon = new ImageView(new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("Icone/denied_alert.png"))));
+        }
+        icon.setFitWidth(60);
+        icon.setFitHeight(60);
+        alert.getDialogPane().setGraphic(icon);
+        alert.setTitle(Head);
+        alert.setHeaderText("");
+        alert.setContentText(message);
+        alert.show();
+    }
+
+    public void setHomeScene() throws Exception {
+        loadFXML("Home.fxml");
+    }
+
+    public void setLoginScene() throws Exception {
+        loadFXML("Login.fxml");
+    }
+
+    public void setRegistrationScene() throws Exception {
+        loadFXML("Registrazione.fxml");
+    }
+
+    public void setUtenteScene() throws Exception {
+        loadFXML("Utente.fxml");
+    }
+
+    public void setRecoveryScene() throws Exception {
+        loadFXML("PasswordDimenticata.fxml");
+    }
+
+    public void setAdminScene() throws Exception {
+        loadFXML("Admin.fxml");
+    }
+
+    public void setTruckDetailsScene() throws Exception {
+        loadFXML("ProductView.fxml");
+    }
+
+    public void setWishlistScene() throws Exception {
+        loadFXML("Wishlist.fxml");
+    }
+}
+

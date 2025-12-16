@@ -1,0 +1,402 @@
+.root {
+    -fx-font-family: "Segoe UI", "Inter", "SF Pro Display", "Roboto", sans-serif;
+    -fx-font-smoothing-type: lcd;
+}
+
+.main-container {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.header-container {
+    -fx-background-color: linear-gradient(to right, #ff6b35, #f7931e);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 2);
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.header-actions {
+    -fx-padding: 20 40 10 40;
+}
+
+.nav-bar {
+    -fx-background-color: transparent;
+    -fx-min-height: 70;
+}
+
+.logo-section {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.logo-section:hover{
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.app-icon {
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.3), 4, 0, 0, 1);
+}
+
+.app-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 700;
+}
+
+.page-subtitle {
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-weight: 500;
+}
+
+/* ================================
+   STATISTICHE E AZIONI
+   ================================ */
+.stats-container {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 8;
+    -fx-padding: 12 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+    -fx-min-width: 90;
+    -fx-max-width: 90;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.stats-label {
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-weight: 600;
+}
+
+.stats-value {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 800;
+}
+
+.header-separator {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-pref-height: 40;
+    -fx-pref-width: 1;
+}
+
+.clear-button,
+.primary-button,
+.remove-button,
+.truck-card-compact,
+.heart-button-filled,
+.heart-button-empty {
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.clear-button {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #ef4444 0%, #dc2626 100%);
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 8;
+    -fx-padding: 12 24;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.3), 6, 0, 0, 2);
+    -fx-cursor: hand;
+    -fx-font-weight: 700;
+}
+
+.clear-button:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #dc2626 0%, #b91c1c 100%);
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.4), 8, 0, 0, 3);
+    -fx-scale-y: 1.05;
+    -fx-scale-x: 1.05;
+}
+
+/* ================================
+   AREA CONTENUTO PRINCIPALE
+   ================================ */
+.content-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-hbar-policy: never;
+}
+
+.content-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.content-scroll .scroll-bar:vertical {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8;
+    -fx-pref-width: 10;
+}
+
+.content-scroll .scroll-bar:vertical .track {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 8;
+}
+
+.content-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #ff6b35 0%, #f7931e 100%);
+    -fx-background-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(255, 107, 53, 0.2), 2, 0, 0, 1);
+}
+
+.content-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #e55a2b 0%, #e6821a 100%);
+}
+
+/* ================================
+   CONTENUTO E SEZIONI
+   ================================ */
+.content-wrapper,
+.content-header {
+    -fx-background-color: transparent;
+}
+
+.section-icon {
+    -fx-text-fill: #ff6b35;
+}
+
+.section-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: 700;
+}
+
+/* ================================
+   FLOWPANE COMPATTO - CONFIGURAZIONE PER CARD PICCOLE
+   ================================ */
+.trucks-flow-compact {
+    -fx-padding: 20;
+    -fx-hgap: 30;
+    -fx-vgap: 30;
+    -fx-background-color: transparent;
+    -fx-alignment: center;
+    -fx-pref-wrap-length: 1400;
+}
+
+/* ================================
+   CARD DEI CAMION COMPATTE - DESIGN PICCOLO E COMPATTO
+   ================================ */
+.truck-card-compact {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-color: lightgray;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 3);
+    -fx-cursor: hand;
+    -fx-pref-width: 300;
+    -fx-max-width: 300;
+    -fx-min-width: 300;
+    -fx-spacing: 5;
+}
+
+.truck-card-compact:hover {
+    -fx-effect: dropshadow(gaussian, rgba(255,107,53,0.3), 12, 0, 0, 5);
+    -fx-border-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-border-width: 2;
+    -fx-background-color: #f0f8ff;
+}
+
+/* ================================
+   HEADER DELLA CARD COMPATTA
+   ================================ */
+.card-header-compact {
+    -fx-alignment: top-right;
+    -fx-padding: 0 0 10 0;
+}
+
+/* ================================
+   IMMAGINE CAMION COMPATTA
+   ================================ */
+.truck-image-compact {
+    -fx-alignment: center;
+}
+
+/* ================================
+   CONTENUTO CAMION COMPATTO
+   ================================ */
+.truck-name-compact {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-text-fill: #2c3e50;
+}
+
+.truck-info-compact {
+    -fx-font-size: 14px;
+    -fx-text-fill: #34495e;
+}
+
+.truck-price-compact {
+    -fx-font-size: 14px;
+    -fx-text-fill: #ff6b35;
+    -fx-font-weight: bold;
+}
+
+.info-row-compact {
+    -fx-alignment: center;
+    -fx-spacing: 12;
+}
+
+.info-box-compact {
+    -fx-alignment: center;
+    -fx-spacing: 8;
+}
+
+/* ================================
+   PULSANTI CUORE PERSONALIZZATI
+   ================================ */
+.heart-button-empty {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-font-size: 18px;
+    -fx-text-fill: #666666;
+    -fx-cursor: hand;
+    -fx-padding: 5px 8px;
+    -fx-min-width: 35px;
+    -fx-min-height: 35px;
+}
+
+.heart-button-empty:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-border-color: #ff6b35;
+    -fx-border-width: 2px;
+    -fx-text-fill: #ff6b35;
+}
+
+.heart-button-filled {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-border-color: #ff6b35;
+    -fx-border-width: 1px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-font-size: 18px;
+    -fx-text-fill: #ff6b35;
+    -fx-cursor: hand;
+    -fx-padding: 5px 8px;
+    -fx-min-width: 35px;
+    -fx-min-height: 35px;
+}
+
+.heart-button-filled:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-border-color: #cc0000;
+    -fx-border-width: 2px;
+    -fx-text-fill: #cc0000;
+}
+
+/* ================================
+   STATO VUOTO
+   ================================ */
+.empty-state {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 60 40;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 16, 0, 0, 6);
+    -fx-max-width: 450;
+    -fx-alignment: center;
+}
+
+.empty-icon {
+    -fx-text-fill: #cbd5e1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 3, 0, 0, 2);
+}
+
+.empty-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: 700;
+}
+
+.empty-description {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-alignment: center;
+    -fx-line-spacing: 3;
+}
+
+.primary-button {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #ff6b35 0%, #f7931e 100%);
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 10;
+    -fx-padding: 12 24;
+    -fx-font-weight: 700;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(255, 107, 53, 0.3), 8, 0, 0, 3);
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #e55a2b 0%, #e6821a 100%);
+    -fx-effect: dropshadow(gaussian, rgba(255, 107, 53, 0.4), 12, 0, 0, 4);
+    -fx-scale-y: 1.05;
+    -fx-scale-x: 1.05;
+}
+
+/* Footer */
+.footer {
+    -fx-background-color: #2c3e50;
+    -fx-padding: 15 30;
+    -fx-min-height: 50px;
+}
+
+/* Label a sinistra */
+.footer-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #bdc3c7;
+    -fx-font-weight: bold;
+}
+
+/* Label a destra */
+.footer-right-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #95a5a6;
+}
+
+/* Etichette cliccabili (link) */
+.footer-link {
+    -fx-font-size: 13px;
+    -fx-text-fill: #3498db;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+.footer-link:hover {
+    -fx-text-fill: #5dade2;
+}
+
+/* ================================
+   RESPONSIVE ADJUSTMENTS
+   ================================ */
+@media (max-width: 768px) {
+    .trucks-flow-compact {
+        -fx-hgap: 20;
+        -fx-vgap: 20;
+        -fx-pref-wrap-length: 700;
+    }
+
+    .truck-card-compact {
+        -fx-pref-width: 460;
+        -fx-max-width: 460;
+        -fx-min-width: 460;
+    }
+
+    .truck-info-compact {
+        -fx-font-size: 13px;
+    }
+
+    .truck-price-compact {
+        -fx-font-size: 14px;
+        -fx-font-weight: bold;
+    }
+
+    .truck-name-compact {
+        -fx-font-size: 15px;
+        -fx-font-weight: bold;
+    }
+}
