@@ -1,0 +1,856 @@
+package com.progetto.ingsw.progettotruckscout24.Database;
+
+
+import java.sql.*;
+import com.progetto.ingsw.trukscout24.Messaggi;
+import com.progetto.ingsw.trukscout24.Model.Camion;
+import com.progetto.ingsw.trukscout24.Model.Prenotazione;
+import com.progetto.ingsw.trukscout24.Model.Utente;
+import com.progetto.ingsw.trukscout24.View.SceneHandler;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import java.sql.DriverManager;
+import java.sql.Connection;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import java.time.LocalDate;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.*;
+
+public class DBConnessione {
+    private static DBConnessione instance = null;
+    private Connection con = null;
+    private ArrayList<Camion> categoryCamion;
+    private ArrayList<Camion> similarCamion;
+    private final ArrayList<Camion> searchedCamion = new ArrayList<>();
+    private Label resultLabel;
+    private Camion camion;
+    public final ExecutorService executorService = Executors.newCachedThreadPool();
+    public final SceneHandler scenehandler = SceneHandler.getInstance();
+
+    public Connection getConnection() {
+        return con;
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    private DBConnessione() {}
+
+    public static DBConnessione getInstance() {
+        if (instance == null) {
+            instance = new DBConnessione();
+        }
+        return instance;
+    }
+
+    public void createConnection() throws SQLException {
+        String url = "jdbc:sqlite:Database24.db";
+        con = DriverManager.getConnection(url);
+        if (con != null && !con.isClosed()) {
+            System.out.println("Connesso!!!");
+            Statement stmt = con.createStatement();
+            stmt.execute("PRAGMA journal_mode=WAL;");
+            stmt.close();
+        }
+    }
+
+
+    public void closeConnection() throws SQLException, IOException {
+        if (con != null)
+            con.close();
+        con = null;
+    }
+
+    public void close() {
+        executorService.shutdownNow();
+    }
+
+    public CompletableFuture<Boolean> checkLoginCredentials(String email, String password) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (con == null || con.isClosed()) {
+                    future.complete(false);
+                    return;
+                }
+
+                String query = "SELECT password FROM utenti WHERE email = ?";
+                PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, email);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    String hashedPassword = rs.getString("password");
+                    boolean isValid = BCrypt.checkpw(password, hashedPassword);
+                    future.complete(isValid);
+                } else {
+                    future.complete(false);
+                }
+
+                stmt.close();
+            } catch (SQLException e) {
+                future.completeExceptionally(e);
+            }
+        }));
+
+        return future;
+    }
+
+    public void insertUsers(String nome, String cognome, String email, Long numero_di_telefono, String password, Boolean isAdmin) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (con == null || con.isClosed())
+                    return;
+
+                String hashedPassword = encryptedPassword(password);
+
+                PreparedStatement stmt = con.prepareStatement("INSERT INTO utenti VALUES(?, ?, ?, ?, ?, ?);");
+                stmt.setString(1, email);
+                stmt.setString(2, nome);
+                stmt.setString(3, cognome);
+                stmt.setLong(4, numero_di_telefono != null ? numero_di_telefono : 0);
+                stmt.setString(5, hashedPassword);
+                stmt.setBoolean(6, isAdmin);
+                stmt.execute();
+                stmt.close();
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore database", "Errore nell'inserimento utente: " + e.getMessage(), 0);
+            }
+        }));
+    }
+
+
+    public CompletableFuture<Utente> setUser(String email) {
+        CompletableFuture<Utente> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                Utente utente;
+                if (con == null || con.isClosed())
+                    future.complete(null);
+                String query = "select * from utenti where email=?;";
+                PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, email);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    utente = new Utente(rs.getString("email"), rs.getString("nome"), rs.getString("cognome"),
+                            rs.getLong("numero_di_telefono"), rs.getBoolean("isAdmin"));
+                    future.complete(utente);
+                }
+                stmt.close();
+            } catch (SQLException e) {
+                future.completeExceptionally(e);
+            }
+        }));
+        return future;
+    }
+
+    public String encryptedPassword(String password) {
+        String generatedSecuredPasswordHash = BCrypt.hashpw(password, BCrypt.gensalt(12));
+        return generatedSecuredPasswordHash;
+    }
+
+    public CompletableFuture<ArrayList<Camion>> addHomePageCamion() {
+        CompletableFuture<ArrayList<Camion>> future = new CompletableFuture<>();
+        executorService.submit(() -> {
+            try {
+                ArrayList<Camion> camion = new ArrayList<>();
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "SELECT * FROM camion;";
+                    PreparedStatement stmt = this.con.prepareStatement(query);
+                    ResultSet rs = stmt.executeQuery();
+
+                    while (rs.next()) {
+                        Camion c = new Camion(rs.getString("id"), rs.getString("nome"), rs.getString("modello"),
+                                rs.getInt("potenza"), rs.getString("kilometri"), rs.getString("carburante"),
+                                rs.getString("cambio"), rs.getInt("classeEmissioni"), rs.getString("anno"),
+                                rs.getString("prezzo"), rs.getString("descrizione"), rs.getString("categoria"));
+                        camion.add(c);
+                    }
+                    future.complete(camion);
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+                future.completeExceptionally(e);
+            }
+        });
+        return future;
+    }
+
+
+    public void addCategoryCamion(String category) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                categoryCamion = new ArrayList<>();
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "select * from camion where categoria=?;";
+                    PreparedStatement stmt = this.con.prepareStatement(query);
+                    stmt.setString(1, category);
+                    ResultSet rs = stmt.executeQuery();
+
+                    while (rs.next()) {
+                        Camion c = new Camion(rs.getString("id"), rs.getString("nome"), rs.getString("modello"),
+                                rs.getInt("potenza"), rs.getString("kilometri"), rs.getString("carburante"),
+                                rs.getString("cambio"), rs.getInt("classeEmissioni"), rs.getString("anno"),
+                                rs.getString("prezzo"), rs.getString("descrizione"), rs.getString("categoria"));
+                        categoryCamion.add(c);
+                    }
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+    }
+
+    public ArrayList<Camion> getCategoryCamion() {
+        return categoryCamion;
+    }
+
+    public void clearCategoryCamionList() {
+        if (categoryCamion != null) {
+            categoryCamion.clear();
+        }
+    }
+
+    public CompletableFuture<Boolean> checkExistEmail(String email) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "SELECT * from utenti WHERE email =?;";
+                    PreparedStatement stmt = this.con.prepareStatement(query);
+                    stmt.setString(1, email);
+                    ResultSet rs = stmt.executeQuery();
+
+                    if (rs.next()) {
+                        future.complete(true);
+                    } else {
+                        future.complete(false);
+                    }
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+        return future;
+    }
+
+    public CompletableFuture<Camion> getCamion(String id) {
+        CompletableFuture<Camion> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "select * from camion where id=?;";
+                    PreparedStatement stmt = this.con.prepareStatement(query);
+                    stmt.setString(1, id);
+                    ResultSet rs = stmt.executeQuery();
+
+                    if (rs.next()) {
+                        camion = new Camion(rs.getString("id"), rs.getString("nome"), rs.getString("modello"),
+                                rs.getInt("potenza"), rs.getString("kilometri"), rs.getString("carburante"),
+                                rs.getString("cambio"), rs.getInt("classeEmissioni"), rs.getString("anno"),
+                                rs.getString("prezzo"), rs.getString("descrizione"), rs.getString("categoria"));
+                        future.complete(camion);
+                    }
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+        return future;
+    }
+
+    public void addSimilarCamion(String id, String category) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                similarCamion = new ArrayList<>();
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "select * from camion where categoria=?;";
+                    PreparedStatement stmt = this.con.prepareStatement(query);
+                    stmt.setString(1, category);
+                    ResultSet rs = stmt.executeQuery();
+
+                    while (rs.next() && similarCamion.size() < 5) {
+                        if (!rs.getString("id").equals(id)) {
+                            camion = new Camion(rs.getString("id"), rs.getString("nome"), rs.getString("modello"),
+                                    rs.getInt("potenza"), rs.getString("kilometri"), rs.getString("carburante"),
+                                    rs.getString("cambio"), rs.getInt("classeEmissioni"), rs.getString("anno"),
+                                    rs.getString("prezzo"), rs.getString("descrizione"), rs.getString("categoria"));
+                            similarCamion.add(camion);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+    }
+
+    public CompletableFuture<ArrayList<Camion>> getSimilarCamions(String currentId, String category) {
+        CompletableFuture<ArrayList<Camion>> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                ArrayList<Camion> similarCamions = new ArrayList<>();
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "SELECT * FROM camion WHERE categoria = ? AND id != ? ORDER BY RANDOM() LIMIT 5";
+                    PreparedStatement stmt = this.con.prepareStatement(query);
+                    stmt.setString(1, category);
+                    stmt.setString(2, currentId);
+                    ResultSet rs = stmt.executeQuery();
+
+                    while (rs.next()) {
+                        Camion camion = new Camion(
+                                rs.getString("id"),
+                                rs.getString("nome"),
+                                rs.getString("modello"),
+                                rs.getInt("potenza"),
+                                rs.getString("kilometri"),
+                                rs.getString("carburante"),
+                                rs.getString("cambio"),
+                                rs.getInt("classeEmissioni"),
+                                rs.getString("anno"),
+                                rs.getString("prezzo"),
+                                rs.getString("descrizione"),
+                                rs.getString("categoria")
+                        );
+                        similarCamions.add(camion);
+                    }
+                    future.complete(similarCamions);
+                }
+            } catch (SQLException e) {
+                future.completeExceptionally(e);
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+        return future;
+    }
+
+
+
+    public CompletableFuture<Label> searchCamion(String searchText) {
+        CompletableFuture<Label> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                resultLabel = new Label();
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "SELECT * FROM camion WHERE chiavi LIKE ?;";
+                    PreparedStatement stmt = con.prepareStatement(query);
+                    stmt.setString(1, "%" + searchText + "%");
+
+                    ResultSet resultSet = stmt.executeQuery();
+                    StringBuilder resultBuilder = new StringBuilder();
+                    while (resultSet.next()) {
+                        String columnValue = resultSet.getString("id");
+                        resultBuilder.append(columnValue + ";");
+                    }
+
+                    resultLabel.setText(resultBuilder.toString());
+                    future.complete(resultLabel);
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+        return future;
+    }
+
+    public void addSearchedCamion(String[] products) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (this.con != null && !this.con.isClosed()) {
+                    for (String id : products) {
+                        String query = "select * from camion where id= ?;";
+                        PreparedStatement stmt = this.con.prepareStatement(query);
+                        stmt.setString(1, id);
+
+                        ResultSet rs = stmt.executeQuery();
+
+                        while (rs.next()) {
+                            Camion c = new Camion(rs.getString("id"), rs.getString("nome"), rs.getString("modello"),
+                                    rs.getInt("potenza"), rs.getString("kilometri"), rs.getString("carburante"),
+                                    rs.getString("cambio"), rs.getInt("classeEmissioni"), rs.getString("anno"),
+                                    rs.getString("prezzo"), rs.getString("descrizione"), rs.getString("categoria"));
+                            searchedCamion.add(c);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+    }
+
+    public ArrayList<Camion> getSearchedCamion() {
+        return searchedCamion;
+    }
+
+    public void clearSearchedList() {
+        if (searchedCamion != null) {
+            searchedCamion.clear();
+        }
+    }
+
+    public CompletableFuture<ArrayList<Camion>> getWishlist(String email) {
+        CompletableFuture<ArrayList<Camion>> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                ArrayList<Camion> cam = new ArrayList<>();
+                if (con == null || con.isClosed())
+                    future.complete(cam);
+                String query = "SELECT * from wishlist where id_utente=?";
+                PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, email);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    CompletableFuture<Camion> future1 = getCamion(rs.getString(2));
+                    Camion c = future1.get(10, TimeUnit.SECONDS);
+                    cam.add(c);
+                }
+                future.complete(cam);
+            } catch (SQLException | ExecutionException | InterruptedException | TimeoutException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+        return future;
+    }
+
+    public boolean insertWishlistCamionIntoDB(String email, String id_camion) {
+        try {
+            CompletableFuture<ArrayList<Camion>> future = getWishlist(email);
+            ArrayList<Camion> nCam = future.get(10, TimeUnit.SECONDS);
+
+            boolean find = false;
+            for (Camion id : nCam) {
+                if (id.id().equals(id_camion)) {
+                    find = true;
+                }
+            }
+
+            if (nCam.size() < 12 && !find) {
+                if (con == null || con.isClosed())
+                    return false;
+
+                PreparedStatement stmt = con.prepareStatement("INSERT INTO wishlist VALUES(?, ?);");
+                stmt.setString(1, email);
+                stmt.setString(2, id_camion);
+                stmt.execute();
+                stmt.close();
+                return true;
+            }
+
+            if (nCam.size() >= 6 || find) {
+                return false;
+            }
+        } catch (SQLException | ExecutionException | InterruptedException | TimeoutException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    public boolean removeCamionFromWishlist(String email, String camionId) {
+        try {
+            if (con == null || con.isClosed())
+                return false;
+
+            String query = "DELETE FROM wishlist WHERE id_utente = ? AND id_camion = ?";
+            PreparedStatement stmt = con.prepareStatement(query);
+            stmt.setString(1, email);
+            stmt.setString(2, camionId);
+
+            int rowsAffected = stmt.executeUpdate();
+            stmt.close();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean clearWishlist(String email) {
+        try {
+            if (con == null || con.isClosed())
+                return false;
+
+            String query = "DELETE FROM wishlist WHERE id_utente = ?";
+            PreparedStatement stmt = con.prepareStatement(query);
+            stmt.setString(1, email);
+
+            int rowsAffected = stmt.executeUpdate();
+            stmt.close();
+
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public CompletableFuture<Integer> getWishlistCount(String email) {
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (con == null || con.isClosed())
+                    future.complete(0);
+
+                String query = "SELECT COUNT(*) FROM wishlist WHERE id_utente = ?";
+                PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, email);
+                ResultSet rs = stmt.executeQuery();
+
+                int count = 0;
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+
+                future.complete(count);
+            } catch (SQLException e) {
+                future.complete(0);
+            }
+        }));
+        return future;
+    }
+
+    public CompletableFuture<ArrayList<Prenotazione>> getPrenotazione(String email) {
+        CompletableFuture<ArrayList<Prenotazione>> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                ArrayList<Prenotazione> pre = new ArrayList<>();
+                if (con == null || con.isClosed())
+                    future.complete(pre);
+                String query = "SELECT * from prenotazioni where id_utente=?";
+                PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, email);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    Prenotazione p = new Prenotazione(rs.getString("id_utente"), rs.getString("nome_camion"),
+                            rs.getInt("giorno"), rs.getInt("mese"), rs.getInt("anno"));
+                    pre.add(p);
+                }
+                future.complete(pre);
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+        return future;
+    }
+
+    public CompletableFuture<ArrayList<Prenotazione>> getPrenotazioniAdmin() {
+        CompletableFuture<ArrayList<Prenotazione>> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            ArrayList<Prenotazione> pre = new ArrayList<>();
+            try {
+                if (con == null || con.isClosed()) {
+                    future.complete(pre);
+                    return;
+                }
+
+                String query = "SELECT * from prenotazioni ORDER BY giorno, mese, anno;";
+                PreparedStatement stmt = con.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    Prenotazione p = new Prenotazione(
+                            rs.getString("id_utente"),
+                            rs.getString("nome_camion"),
+                            rs.getInt("giorno"),
+                            rs.getInt("mese"),
+                            rs.getInt("anno")
+                    );
+                    pre.add(p);
+                }
+
+                future.complete(pre);
+
+            } catch (SQLException e) {
+                future.completeExceptionally(e);
+                Platform.runLater(() ->
+                        scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0)
+                );
+            }
+        }));
+        return future;
+    }
+
+
+    public String getCamionName(String id) {
+        try {
+            CompletableFuture<Camion> future = getCamion(id);
+            Camion c = future.get(10, TimeUnit.SECONDS);
+            return c.nome();
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+        }
+        return null;
+    }
+
+    public void insertPrenotazioneIntoDB(String email, String nome_camion, int giorno, int mese, int anno) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                CompletableFuture<ArrayList<Prenotazione>> future = getPrenotazione(email);
+                ArrayList<Prenotazione> nPre = future.get(10, TimeUnit.SECONDS);
+                boolean find = false;
+                for (Prenotazione nome : nPre) {
+                    if (nome.nome_camion().equals(nome_camion)) {
+                        find = true;
+                        break;
+                    }
+                }
+
+                if (find) {
+                    Platform.runLater(() -> scenehandler.showAlert("Attenzione", Messaggi.add_prenotazioni_find_information, 1));
+                    return;
+                }
+
+                if (nPre.size() < 6) {
+                    if (con == null || con.isClosed()) return;
+                    PreparedStatement stmt = con.prepareStatement("INSERT INTO prenotazioni (id_utente, nome_camion, giorno, mese, anno) VALUES(?, ?, ?, ?, ?);");
+                    stmt.setString(1, email);
+                    stmt.setString(2, nome_camion);
+                    stmt.setInt(3, giorno);
+                    stmt.setInt(4, mese);
+                    stmt.setInt(5, anno);
+                    stmt.execute();
+                    stmt.close();
+
+                    Platform.runLater(() -> scenehandler.showAlert("Conferma", Messaggi.conferma_prenotazione + LocalDate.of(anno, mese, giorno), 1));
+                } else {
+                    Platform.runLater(() -> scenehandler.showAlert("Attenzione", Messaggi.add_prenotazioni_max_information, 1));
+                }
+            } catch (SQLException | ExecutionException | InterruptedException | TimeoutException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+    }
+
+    public void removeSelectedPrenotazioniItem(String nome_camion, String id_utente) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (con == null || con.isClosed())
+                    return;
+                String query = "DELETE FROM prenotazioni where nome_camion = ? and id_utente = ?;";
+                PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, nome_camion);
+                stmt.setString(2, id_utente);
+                stmt.execute();
+                stmt.close();
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+    }
+
+    public void removeSelectedWishlistItem(String id, String email) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (con == null || con.isClosed())
+                    return;
+                String query = "DELETE FROM wishlist where id_utente=? and id_camion = ?;";
+                PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, email);
+                stmt.setString(2, id);
+                stmt.execute();
+                stmt.close();
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+    }
+
+    public void updatePassword(String email, String password) {
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                if (this.con != null && !this.con.isClosed()) {
+                    String query = "update utenti set password = ? where email=?;";
+                    PreparedStatement stmt = this.con.prepareStatement(query);
+                    stmt.setString(1, password);
+                    stmt.setString(2, email);
+                    stmt.execute();
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", Messaggi.thread_error, 0);
+            }
+        }));
+    }
+
+    public boolean aggiungiCamion(String idCamion, String nomeCamion, String modelloCamion, Integer potenzaCamion,
+                                  String kilometriCamion, String carburanteCamion, String cambioCamion,
+                                  Integer classeEmissioniCamion, String annoCamion, String prezzoCamion,
+                                  String descrizioneCamion, String categoriaCamion, String chiaviCamion) {
+        try {
+            if (con == null || con.isClosed()) {
+                Platform.runLater(() -> scenehandler.showAlert("Errore Database", "Connessione al database non disponibile.", 0));
+                return false;
+            }
+
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO camion (id, nome, modello, potenza, kilometri, carburante, cambio, classeEmissioni, anno, prezzo, descrizione, categoria, chiavi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            stmt.setString(1, idCamion);
+            stmt.setString(2, nomeCamion);
+            stmt.setString(3, modelloCamion);
+            stmt.setInt(4, potenzaCamion);
+            stmt.setString(5, kilometriCamion);
+            stmt.setString(6, carburanteCamion);
+            stmt.setString(7, cambioCamion);
+            stmt.setInt(8, classeEmissioniCamion);
+            stmt.setString(9, annoCamion);
+            stmt.setString(10, prezzoCamion);
+            stmt.setString(11, descrizioneCamion);
+            stmt.setString(12, categoriaCamion);
+            stmt.setString(13, chiaviCamion);
+
+            stmt.execute();
+            stmt.close();
+
+            return true;
+        } catch (SQLException e) {
+            Platform.runLater(() -> scenehandler.showAlert("Errore Database", Messaggi.errore_generico , 0));
+            return false;
+        }
+    }
+
+
+    public boolean rimuoviCamion(String idCamion) {
+        try {
+            if (con == null || con.isClosed()) {
+                throw new SQLException("Connessione al database non disponibile.");
+            }
+
+            PreparedStatement deletePrenotazioniStmt = con.prepareStatement("DELETE FROM prenotazioni WHERE nome_camion = ?;");
+            deletePrenotazioniStmt.setString(1, idCamion);
+            int prenotazioniEliminate = deletePrenotazioniStmt.executeUpdate();
+            deletePrenotazioniStmt.close();
+
+            PreparedStatement deleteWishlistStmt = con.prepareStatement("DELETE FROM wishlist WHERE id_camion = ?;");
+            deleteWishlistStmt.setString(1, idCamion);
+            int wishlistEliminate = deleteWishlistStmt.executeUpdate();
+            deleteWishlistStmt.close();
+
+            PreparedStatement deleteCamionStmt = con.prepareStatement("DELETE FROM camion WHERE id = ?;");
+            deleteCamionStmt.setString(1, idCamion);
+            int rowsAffected = deleteCamionStmt.executeUpdate();
+            deleteCamionStmt.close();
+
+            if (rowsAffected > 0) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Errore database: " + e.getMessage(), e);
+        }
+    }
+
+    public CompletableFuture<ArrayList<Camion>> advancedSearchCamions(String modello, int potenza, String maxPrice, String category, int maxKm, String cambio) {
+        CompletableFuture<ArrayList<Camion>> future = new CompletableFuture<>();
+        executorService.submit(createDaemonThread(() -> {
+            try {
+                ArrayList<Camion> results = new ArrayList<>();
+                if (con == null || con.isClosed()) {
+                    future.complete(results);
+                    return;
+                }
+
+                StringBuilder query = new StringBuilder("SELECT * FROM camion WHERE 1=1");
+                List<Object> parameters = new ArrayList<>();
+
+                if (modello != null && !modello.equals("Tutti")) {
+                    query.append(" AND modello = ?");
+                    parameters.add(modello);
+                }
+
+                if (potenza > 200) {
+                    query.append(" AND potenza >= ?");
+                    parameters.add(potenza);
+                }
+
+                if (maxPrice != null && !maxPrice.trim().isEmpty()) {
+                    try {
+                        int priceValue = Integer.parseInt(maxPrice);
+                        if (priceValue < 100000) {
+                            query.append(" AND CAST(REPLACE(prezzo, '.', '') AS UNSIGNED) <= ?");
+                            parameters.add(priceValue);
+                        }
+                    } catch (NumberFormatException e) {
+                        scenehandler.showAlert("Errore", Messaggi.errore_generico,0);
+                    }
+                }
+
+                if (category != null && !category.equals("Tutti")) {
+                    query.append(" AND nome LIKE ?");
+                    parameters.add("%" + category + "%");
+                }
+
+                if (maxKm < 2500000) {
+                    query.append(" AND CAST(REPLACE(kilometri, '.', '') AS UNSIGNED) <= ?");
+                    parameters.add(maxKm);
+                }
+
+                if (cambio != null && !cambio.equals("Tutti")) {
+                    query.append(" AND cambio = ?");
+                    parameters.add(cambio);
+                }
+
+                query.append(" ORDER BY CAST(REPLACE(prezzo, '.', '') AS UNSIGNED) ASC");
+                PreparedStatement stmt = con.prepareStatement(query.toString());
+
+                for (int i = 0; i < parameters.size(); i++) {
+                    Object param = parameters.get(i);
+                    if (param instanceof Integer) {
+                        stmt.setInt(i + 1, (Integer) param);
+                    } else {
+                        stmt.setString(i + 1, (String) param);
+                    }
+                }
+
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    Camion camion = new Camion(
+                            rs.getString("id"),
+                            rs.getString("nome"),
+                            rs.getString("modello"),
+                            rs.getInt("potenza"),
+                            rs.getString("kilometri"),
+                            rs.getString("carburante"),
+                            rs.getString("cambio"),
+                            rs.getInt("classeEmissioni"),
+                            rs.getString("anno"),
+                            rs.getString("prezzo"),
+                            rs.getString("descrizione"),
+                            rs.getString("categoria")
+                    );
+                    results.add(camion);
+                }
+
+                future.complete(results);
+            } catch (SQLException e) {
+                scenehandler.showAlert("Errore thread", "Errore durante la ricerca avanzata: " + e.getMessage(), 0);
+                future.complete(new ArrayList<>());
+            }
+        }));
+        return future;
+    }
+
+    private Thread createDaemonThread(Runnable runnable) {
+        Thread t = new Thread(runnable);
+        t.setDaemon(true);
+        return t;
+    }
+}
+

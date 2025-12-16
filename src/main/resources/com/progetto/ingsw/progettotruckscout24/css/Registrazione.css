@@ -1,0 +1,120 @@
+/* Sfondo finestra */
+.root {
+    -fx-background-color: transparent;
+    -fx-pref-width: 1400px;
+    -fx-pref-height: 900px;
+}
+
+/* Container principale */
+.form-container {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-padding: 25;
+    -fx-spacing: 20;
+    -fx-max-width: 500px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 20, 0.5, 0, 0);
+}
+
+/* Logo cliccabile */
+.logo-container {
+    -fx-cursor: hand;
+}
+
+.logo-container:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Container campi */
+.form-fields {
+    -fx-spacing: 15;
+}
+
+/* Etichette */
+.label-field {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000;
+    -fx-min-width: 100px;
+}
+
+/* Input */
+.input-field {
+    -fx-padding: 8;
+    -fx-border-color: linear-gradient(to right, #ff6b35, #f7931e);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-pref-width: 250px;
+    -fx-prompt-text-fill: grey;
+    -fx-text-fill: #000;
+}
+
+/* Campi Password con StackPane */
+.password-field {
+    -fx-padding: 8 35 8 8; /* Padding extra a destra per il pulsante */
+    -fx-border-color: linear-gradient(to right, #ff6b35, #f7931e);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-pref-width: 250px;
+    -fx-prompt-text-fill: grey;
+    -fx-text-fill: #000;
+}
+
+.text-field:focused,
+.password-field:focused,
+.input-field:focused{
+    -fx-border-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-border-width: 2px;
+}
+
+/* Pulsante toggle password */
+.toggle-button {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+    -fx-padding: 5;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-text-fill: white;
+}
+
+.toggle-button:hover {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-background-radius: 6;
+}
+
+.toggle-button:pressed {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+}
+
+/* Pulsante Registrazione */
+.register-button {
+    -fx-background-color: #FF6B00;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-pref-width: 200px;
+    -fx-cursor: hand;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+}
+
+.register-button:hover {
+    -fx-background-color: #FF4500;
+}
+
+/* Login */
+.login-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #666666;
+}
+
+.login-link {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FF6B00;
+    -fx-cursor: hand;
+}
